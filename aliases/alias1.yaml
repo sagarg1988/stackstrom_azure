@@ -1,0 +1,7 @@
+---
+name: vm_create
+pack: stackstrom_azure
+description: "Greet StackStorm"
+action_ref: "stackstrom_azure.vm_create"
+formats:
+  - "vm_create {{Group_Name}} {{Location}} {{VM_Name}}"

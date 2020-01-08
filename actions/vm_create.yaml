@@ -1,0 +1,19 @@
+---
+  name: "vm_create"
+  runner_type: "python-script"
+  description: "Create a VM"
+  enabled: true
+  entry_point: "vm_create.py"
+  parameters:
+    Group_Name:
+      type: "string"
+      description: "Group_Name"
+      required: false
+    Location:
+      type: "string"
+      description: "Location"
+      required: false
+    VM_Name:
+      type: "string"
+      description: "VM_Name"
+      required: false

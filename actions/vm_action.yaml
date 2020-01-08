@@ -1,0 +1,20 @@
+---
+name: vm_workflow
+pack: azure_vm_create
+description: Process an github deployment event and install a pack if the environment matches.
+enabled: true
+entry_point: workflows/vm_action.yaml
+runner_type: orquesta
+parameters:
+  Group_Name:
+    type: string
+    description: 'Group_Name of VM'
+    required: true
+  Location:
+    type: string
+    description: 'Location of VM '
+    required: true
+  VM_Name:
+    type: string
+    description: 'Name of VM'
+    required: true
