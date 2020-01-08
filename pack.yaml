@@ -1,6 +1,6 @@
 # Pack reference. It can only contain letters, digits and underscores.
 ref: stackstrom_azure
-name: Azure VM Create
+name: StackStrom Azure VM Create
 description: Our project goal to create VM in Azure.
 keywords:
     - Create VM
