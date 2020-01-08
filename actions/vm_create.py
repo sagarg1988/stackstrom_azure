@@ -134,13 +134,13 @@ class VmCreate(Action):
         # Recycling NIC of previous VM
         print('\nCreating Windows Virtual Machine')
         vm_parameters = create_w_vm_parameters(nic.id, VM_REFERENCE['windows'])
-        async_vm_creation = compute_client.virtual_machines.create_or_update(
+        async_w_vm_creation = compute_client.virtual_machines.create_or_update(
             GROUP_NAME, W_VM_NAME, vm_parameters)
-        async_vm_creation.wait()
+        async_w_vm_creation.wait()
 
         # Attach data disk
         print('\nAttach Data Disk To Windows Machine')
-        async_vm_update = compute_client.virtual_machines.create_or_update(
+        async_w_vm_update = compute_client.virtual_machines.create_or_update(
             GROUP_NAME,
             W_VM_NAME,
             {
@@ -159,11 +159,11 @@ class VmCreate(Action):
                 }
             }
         )
-        async_vm_update.wait()
+        async_w_vm_update.wait()
 
         print('\nStart Windows Virtual Machine')
-        async_vm_start = compute_client.virtual_machines.start(GROUP_NAME, W_VM_NAME)
-        async_vm_start.wait()
+        async_w_vm_start = compute_client.virtual_machines.start(GROUP_NAME, W_VM_NAME)
+        async_w_vm_start.wait()
 
         return
 
