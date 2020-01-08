@@ -1,6 +1,6 @@
 ---
 name: vm_workflow
-pack: azure_vm_create
+pack: stackstrom_azure
 description: Process an github deployment event and install a pack if the environment matches.
 enabled: true
 entry_point: workflows/vm_action.yaml
