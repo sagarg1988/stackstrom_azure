@@ -43,9 +43,9 @@ VM_REFERENCE = {
         'version': 'latest'
     },
     'windows': {
-        'publisher': 'MicrosoftWindowsServerEssentials',
-        'offer': 'WindowsServerEssentials',
-        'sku': 'WindowsServerEssentials',
+        'publisher': 'MicrosoftWindowsServer',
+        'offer': 'WindowsServer',
+        'sku': '2016-Datacenter',
         'version': 'latest'
     }
 }
@@ -92,39 +92,35 @@ class VmCreate(Action):
         # Create a NIC
         nic = create_nic(network_client)
 
-        #############
-        # VM Sample #
-        #############
-
         # Create Linux VM
         print('\nCreating Linux Virtual Machine')
-        vm_parameters = create_vm_parameters(nic.id, VM_REFERENCE['linux'])
+        vm_parameters = create_vm_parameters(nic.id, VM_REFERENCE['linux'],VM_NAME)
         async_vm_creation = compute_client.virtual_machines.create_or_update(
             GROUP_NAME, VM_NAME, vm_parameters)
         async_vm_creation.wait()
 
         # Attach data disk
-        print('\nAttach Data Disk To Linux Machine')
-        async_vm_update = compute_client.virtual_machines.create_or_update(
-            GROUP_NAME,
-            VM_NAME,
-            {
-                'location': LOCATION,
-                'storage_profile': {
-                    'data_disks': [{
-                        'name': 'mydatadisk1',
-                        'disk_size_gb': 1,
-                        'lun': 0,
-                        'vhd': {
-                            'uri': "http://{}.blob.core.windows.net/vhds/mydatadisk1.vhd".format(
-                                STORAGE_ACCOUNT_NAME)
-                        },
-                        'create_option': 'Empty'
-                    }]
-                }
-            }
-        )
-        async_vm_update.wait()
+        # print('\nAttach Data Disk To Linux Machine')
+        # async_vm_update = compute_client.virtual_machines.create_or_update(
+        #     GROUP_NAME,
+        #     VM_NAME,
+        #     {
+        #         'location': LOCATION,
+        #         'storage_profile': {
+        #             'data_disks': [{
+        #                 'name': 'mydatadisk1',
+        #                 'disk_size_gb': 1,
+        #                 'lun': 0,
+        #                 'vhd': {
+        #                     'uri': "http://{}.blob.core.windows.net/vhds/mydatadisk1.vhd".format(
+        #                         STORAGE_ACCOUNT_NAME)
+        #                 },
+        #                 'create_option': 'Empty'
+        #             }]
+        #         }
+        #     }
+        # )
+        # async_vm_update.wait()
 
         # Start the VM
         print('\nStart Linux Virtual Machine')
@@ -133,38 +129,14 @@ class VmCreate(Action):
 
         # Recycling NIC of previous VM
         print('\nCreating Windows Virtual Machine')
-        vm_parameters = create_w_vm_parameters(nic.id, VM_REFERENCE['windows'])
+        vm_parameters = create_vm_parameters(nic.id, VM_REFERENCE['windows'],W_VM_NAME)
         async_w_vm_creation = compute_client.virtual_machines.create_or_update(
             GROUP_NAME, W_VM_NAME, vm_parameters)
         async_w_vm_creation.wait()
 
-        # Attach data disk
-        print('\nAttach Data Disk To Windows Machine')
-        async_w_vm_update = compute_client.virtual_machines.create_or_update(
-            GROUP_NAME,
-            W_VM_NAME,
-            {
-                'location': LOCATION,
-                'storage_profile': {
-                    'data_disks': [{
-                        'name': 'mydatadisk1',
-                        'disk_size_gb': 1,
-                        'lun': 0,
-                        'vhd': {
-                            'uri': "http://{}.blob.core.windows.net/vhds/mydatadisk1.vhd".format(
-                                STORAGE_ACCOUNT_NAME)
-                        },
-                        'create_option': 'Empty'
-                    }]
-                }
-            }
-        )
-        async_w_vm_update.wait()
-
         print('\nStart Windows Virtual Machine')
         async_w_vm_start = compute_client.virtual_machines.start(GROUP_NAME, W_VM_NAME)
         async_w_vm_start.wait()
-
         return
 
 def create_nic(network_client):
@@ -211,7 +183,7 @@ def create_nic(network_client):
     )
     return async_nic_creation.result()
 
-def create_vm_parameters(nic_id, vm_reference):
+def create_vm_parameters(nic_id, vm_reference,VM_NAME):
     """Create the VM parameters structure.
     """
     return {
@@ -230,59 +202,13 @@ def create_vm_parameters(nic_id, vm_reference):
                 'offer': vm_reference['offer'],
                 'sku': vm_reference['sku'],
                 'version': vm_reference['version']
-            },
-            'os_disk': {
-                'name': OS_DISK_NAME,
-                'caching': 'None',
-                'create_option': 'fromImage',
-                'vhd': {
-                    'uri': 'https://{}.blob.core.windows.net/vhds/{}.vhd'.format(
-                        STORAGE_ACCOUNT_NAME, VM_NAME+haikunator.haikunate())
-                }
-            },
+            }
         },
         'network_profile': {
             'network_interfaces': [{
                 'id': nic_id,
             }]
-        },
-    }
-
-def create_w_vm_parameters(nic_id, vm_reference):
-    """Create the VM parameters structure.
-    """
-    return {
-        'location': LOCATION,
-        'os_profile': {
-            'computer_name': W_VM_NAME,
-            'admin_username': USERNAME,
-            'admin_password': PASSWORD
-        },
-        'hardware_profile': {
-            'vm_size': 'Standard_DS1'
-        },
-        'storage_profile': {
-            'image_reference': {
-                'publisher': vm_reference['publisher'],
-                'offer': vm_reference['offer'],
-                'sku': vm_reference['sku'],
-                'version': vm_reference['version']
-            },
-            'os_disk': {
-                'name': OS_DISK_NAME,
-                'caching': 'None',
-                'create_option': 'fromImage',
-                'vhd': {
-                    'uri': 'https://{}.blob.core.windows.net/vhds/{}.vhd'.format(
-                        STORAGE_ACCOUNT_NAME, W_VM_NAME+haikunator.haikunate())
-                }
-            },
-        },
-        'network_profile': {
-            'network_interfaces': [{
-                'id': nic_id,
-            }]
-        },
+        }
     }
 
 if __name__ == '__main__':
