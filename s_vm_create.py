@@ -50,7 +50,7 @@ VM_REFERENCE = {
     }
 }
 
-def run(self,Group_Name='test',Location='test',VM_Name='test'):
+def run():
 
     # Create 1st VM
     subscription_id = os.environ.get(
