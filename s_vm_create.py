@@ -53,7 +53,6 @@ VM_REFERENCE = {
 
 def run():
 
-    # Create 1st VM
     subscription_id = os.environ.get(
         'AZURE_SUBSCRIPTION_ID',
         'ef80a466-7372-49e9-b247-57b95886881c')
@@ -90,55 +89,30 @@ def run():
         }
     )
     storage_async_operation.wait()
-
     create_vnet(network_client)
     create_subnet(network_client)
     # Create a NIC
     nic = create_nic(network_client,NIC_NAME)
-
     # Create Linux VM
     print('\nCreating Linux Virtual Machine')
     vm_parameters = create_vm_parameters(nic.id, VM_REFERENCE['linux'],VM_NAME)
     async_vm_creation = compute_client.virtual_machines.create_or_update(
         GROUP_NAME, VM_NAME, vm_parameters)
     async_vm_creation.wait()
-
-    # Attach data disk
-    # print('\nAttach Data Disk To Linux Machine')
-    # async_vm_update = compute_client.virtual_machines.create_or_update(
-    #     GROUP_NAME,
-    #     VM_NAME,
-    #     {
-    #         'location': LOCATION,
-    #         'storage_profile': {
-    #             'data_disks': [{
-    #                 'name': 'mydatadisk1',
-    #                 'disk_size_gb': 1,
-    #                 'lun': 0,
-    #                 'vhd': {
-    #                     'uri': "http://{}.blob.core.windows.net/vhds/mydatadisk1.vhd".format(
-    #                         STORAGE_ACCOUNT_NAME)
-    #                 },
-    #                 'create_option': 'Empty'
-    #             }]
-    #         }
-    #     }
-    # )
-    # async_vm_update.wait()
-
     # Start the VM
     print('\nStart Linux Virtual Machine')
     async_vm_start = compute_client.virtual_machines.start(GROUP_NAME, VM_NAME)
     async_vm_start.wait()
 
-    # Recycling NIC of previous VM
-    print('\nCreating Windows Virtual Machine')
+    # Create a NIC
     nic = create_nic(network_client, W_NIC_NAME)
+    print('\nCreating Windows Virtual Machine')
+    # Create Windows VM
     vm_parameters = create_vm_parameters(nic.id, VM_REFERENCE['windows'],W_VM_NAME)
     async_w_vm_creation = compute_client.virtual_machines.create_or_update(
         GROUP_NAME, W_VM_NAME, vm_parameters)
     async_w_vm_creation.wait()
-
+    # Start the VM
     print('\nStart Windows Virtual Machine')
     async_w_vm_start = compute_client.virtual_machines.start(GROUP_NAME, W_VM_NAME)
     async_w_vm_start.wait()

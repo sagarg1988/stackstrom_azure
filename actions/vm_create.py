@@ -29,7 +29,8 @@ OS_DISK_NAME = 'Cloudera-CentOS-OS-Image'
 STORAGE_ACCOUNT_NAME = haikunator.haikunate(delimiter='')
 
 IP_CONFIG_NAME = '203.18.137.2'
-NIC_NAME = 'azure-nic'
+NIC_NAME = 'azure-linux-nic'
+W_NIC_NAME = 'azure-windows-nic'
 USERNAME = 'mukeshkumar5375N'
 PASSWORD = 'nihilent@123'
 VM_NAME = 'Linux-VM'
@@ -52,8 +53,6 @@ VM_REFERENCE = {
 
 class VmCreate(Action):
     def run(self,Group_Name='test',Location='test',VM_Name='test'):
-
-        # Create 1st VM
         subscription_id = os.environ.get(
             'AZURE_SUBSCRIPTION_ID',
             'ef80a466-7372-49e9-b247-57b95886881c')
@@ -70,7 +69,6 @@ class VmCreate(Action):
         ###########
         # Prepare #
         ###########
-
         # Create Resource group
         print('\nCreate Resource Group')
         resource_client.resource_groups.create_or_update(
@@ -88,61 +86,36 @@ class VmCreate(Action):
             }
         )
         storage_async_operation.wait()
-
+        create_vnet(network_client)
+        create_subnet(network_client)
         # Create a NIC
-        nic = create_nic(network_client)
-
+        nic = create_nic(network_client, NIC_NAME)
         # Create Linux VM
         print('\nCreating Linux Virtual Machine')
-        vm_parameters = create_vm_parameters(nic.id, VM_REFERENCE['linux'],VM_NAME)
+        vm_parameters = create_vm_parameters(nic.id, VM_REFERENCE['linux'], VM_NAME)
         async_vm_creation = compute_client.virtual_machines.create_or_update(
             GROUP_NAME, VM_NAME, vm_parameters)
         async_vm_creation.wait()
-
-        # Attach data disk
-        # print('\nAttach Data Disk To Linux Machine')
-        # async_vm_update = compute_client.virtual_machines.create_or_update(
-        #     GROUP_NAME,
-        #     VM_NAME,
-        #     {
-        #         'location': LOCATION,
-        #         'storage_profile': {
-        #             'data_disks': [{
-        #                 'name': 'mydatadisk1',
-        #                 'disk_size_gb': 1,
-        #                 'lun': 0,
-        #                 'vhd': {
-        #                     'uri': "http://{}.blob.core.windows.net/vhds/mydatadisk1.vhd".format(
-        #                         STORAGE_ACCOUNT_NAME)
-        #                 },
-        #                 'create_option': 'Empty'
-        #             }]
-        #         }
-        #     }
-        # )
-        # async_vm_update.wait()
-
         # Start the VM
         print('\nStart Linux Virtual Machine')
         async_vm_start = compute_client.virtual_machines.start(GROUP_NAME, VM_NAME)
         async_vm_start.wait()
 
-        # Recycling NIC of previous VM
+        # Create a NIC
+        nic = create_nic(network_client, W_NIC_NAME)
         print('\nCreating Windows Virtual Machine')
-        vm_parameters = create_vm_parameters(nic.id, VM_REFERENCE['windows'],W_VM_NAME)
+        # Create Windows VM
+        vm_parameters = create_vm_parameters(nic.id, VM_REFERENCE['windows'], W_VM_NAME)
         async_w_vm_creation = compute_client.virtual_machines.create_or_update(
             GROUP_NAME, W_VM_NAME, vm_parameters)
         async_w_vm_creation.wait()
-
+        # Start the VM
         print('\nStart Windows Virtual Machine')
         async_w_vm_start = compute_client.virtual_machines.start(GROUP_NAME, W_VM_NAME)
         async_w_vm_start.wait()
         return
 
-def create_nic(network_client):
-    """Create a Network Interface for a VM.
-    """
-    # Create VNet
+def create_vnet(network_client):
     print('\nCreate Vnet')
     async_vnet_creation = network_client.virtual_networks.create_or_update(
         GROUP_NAME,
@@ -155,8 +128,9 @@ def create_nic(network_client):
         }
     )
     async_vnet_creation.wait()
+    return
 
-    # Create Subnet
+def create_subnet(network_client):
     print('\nCreate Subnet')
     async_subnet_creation = network_client.subnets.create_or_update(
         GROUP_NAME,
@@ -164,7 +138,16 @@ def create_nic(network_client):
         SUBNET_NAME,
         {'address_prefix': '10.0.0.0/24'}
     )
-    subnet_info = async_subnet_creation.result()
+    return async_subnet_creation.result()
+
+def create_nic(network_client,NIC_NAME):
+    """Create a Network Interface for a VM.
+    """
+    subnet_info = network_client.subnets.get(
+        GROUP_NAME,
+        VNET_NAME,
+        SUBNET_NAME
+    )
 
     # Create NIC
     print('\nCreate NIC')
@@ -209,34 +192,6 @@ def create_vm_parameters(nic_id, vm_reference,VM_NAME):
                 'id': nic_id,
             }]
         }
-    }
-
-    vm_parameters = {
-        'location': LOCATION,
-        'os_profile': {
-            'computer_name': W_VM_NAME,
-            'admin_username': USERNAME,
-            'admin_password': PASSWORD
-        },
-        'hardware_profile': {
-            'vm_size': 'Standard_DS1'
-        },
-        'storage_profile': {
-            'image_reference': {
-                'publisher': 'MicrosoftWindowsServer',
-                'offer': 'WindowsServer',
-                'sku': '2012-R2-Datacenter',
-                'version': 'latest'
-            }
-        },
-        'network_profile': {
-            'network_interfaces': [{
-                'id': nic.id
-            }]
-        },
-        # 'availability_set': {
-        #     'id': avset.id
-        # }
     }
 
 if __name__ == '__main__':
