@@ -8,12 +8,6 @@ input:
   - Location
   - VM_Name
 
-vars:
-  - Sub_id: 'ef80a466-7372-49e9-b247-57b95886881c'
-  - C_id: '445a1911-819a-41e8-a093-adfd66ca5ccd'
-  - Secret: 'rJ--cHsg@=fucrddh3svx1VUe91q2h1N'
-  - T_id:  '8ee0f3e4-b788-4efa-bd84-e6bfe7fe9943'
-
 tasks:
   create_vm:
       action: stackstrom_azure.vm_create Group_Name=<% ctx(Group_Name) %> Location=<% ctx(Location) %> VM_Name=<% ctx(VM_Name) %>
