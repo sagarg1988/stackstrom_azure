@@ -211,5 +211,33 @@ def create_vm_parameters(nic_id, vm_reference,VM_NAME):
         }
     }
 
+    vm_parameters = {
+        'location': LOCATION,
+        'os_profile': {
+            'computer_name': W_VM_NAME,
+            'admin_username': USERNAME,
+            'admin_password': PASSWORD
+        },
+        'hardware_profile': {
+            'vm_size': 'Standard_DS1'
+        },
+        'storage_profile': {
+            'image_reference': {
+                'publisher': 'MicrosoftWindowsServer',
+                'offer': 'WindowsServer',
+                'sku': '2012-R2-Datacenter',
+                'version': 'latest'
+            }
+        },
+        'network_profile': {
+            'network_interfaces': [{
+                'id': nic.id
+            }]
+        },
+        # 'availability_set': {
+        #     'id': avset.id
+        # }
+    }
+
 if __name__ == '__main__':
     VmCreate.run()
