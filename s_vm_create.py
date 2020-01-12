@@ -91,6 +91,8 @@ def run():
     )
     storage_async_operation.wait()
 
+    create_vnet(network_client)
+    create_subnet(network_client)
     # Create a NIC
     nic = create_nic(network_client,NIC_NAME)
 
