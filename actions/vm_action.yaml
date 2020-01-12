@@ -9,12 +9,12 @@ parameters:
   Group_Name:
     type: string
     description: 'Group_Name of VM'
-    required: true
+    required: false
   Location:
     type: string
     description: 'Location of VM '
-    required: true
+    required: false
   VM_Name:
     type: string
     description: 'Name of VM'
-    required: true
+    required: false

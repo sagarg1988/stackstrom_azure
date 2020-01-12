@@ -16,27 +16,12 @@ vars:
 
 tasks:
   create_vm:
-    action: azure_vm.create_vm
-    input:
-      Subcription_id: <% ctx().Sub_id %>
-      Location: <% ctx().Location %>
-      VM_Name: <% ctx().VM_Name %>
-      Group_Name: <% ctx().Group_Name %>
-      Client_Id: <% ctx().C_id %>
-      Secret: <% ctx().Secret %>
-      Tenant_Id: <% ctx().T_id %>
-    next:
+      action: stackstrom_azure.vm_create Group_Name=<% ctx(Group_Name) %> Location=<% ctx(Location) %> VM_Name=<% ctx(VM_Name) %>
+      next:
       - when: <% succeeded() %>
-        do:
-          - send_email
-      - when: <% failed() %>
-        do:
-          - vm_not_created
-  send_email:
-    action: core.local
-    input:
-      cmd : echo Workflow Successful.
-  vm_not_created:
-    action: core.local
-    input:
-       cmd: echo Workflow Unsuccessful
+          publish:
+          - stdout: <% result().stdout %>
+          - stderr: <% result().stderr %>
+
+output:
+- stdout: <% ctx(stdout) %>
