@@ -1,10 +1,10 @@
 import os
-from st2common.runners.base_action import Action
-from smtplib import SMTP
-from email.header import Header
-from email.mime.application import MIMEApplication
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+# from st2common.runners.base_action import Action
+# from smtplib import SMTP
+# from email.header import Header
+# from email.mime.application import MIMEApplication
+# from email.mime.multipart import MIMEMultipart
+# from email.mime.text import MIMEText
 
 from azure.common.credentials import ServicePrincipalCredentials
 from azure.mgmt.resource import ResourceManagementClient
