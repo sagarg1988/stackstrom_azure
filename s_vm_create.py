@@ -29,7 +29,8 @@ OS_DISK_NAME = 'Cloudera-CentOS-OS-Image'
 STORAGE_ACCOUNT_NAME = haikunator.haikunate(delimiter='')
 
 IP_CONFIG_NAME = '203.18.137.2'
-NIC_NAME = 'azure-nic'
+NIC_NAME = 'azure-linux-nic'
+W_NIC_NAME = 'azure-windows-nic'
 USERNAME = 'mukeshkumar5375N'
 PASSWORD = 'nihilent@123'
 VM_NAME = 'Linux-VM'
@@ -91,7 +92,7 @@ def run():
     storage_async_operation.wait()
 
     # Create a NIC
-    nic = create_nic(network_client)
+    nic = create_nic(network_client,NIC_NAME)
 
     # Create Linux VM
     print('\nCreating Linux Virtual Machine')
@@ -130,6 +131,7 @@ def run():
 
     # Recycling NIC of previous VM
     print('\nCreating Windows Virtual Machine')
+    nic = create_nic(network_client, W_NIC_NAME)
     vm_parameters = create_vm_parameters(nic.id, VM_REFERENCE['windows'],W_VM_NAME)
     async_w_vm_creation = compute_client.virtual_machines.create_or_update(
         GROUP_NAME, W_VM_NAME, vm_parameters)
@@ -140,10 +142,7 @@ def run():
     async_w_vm_start.wait()
     return
 
-def create_nic(network_client):
-    """Create a Network Interface for a VM.
-    """
-    # Create VNet
+def create_vnet(network_client):
     print('\nCreate Vnet')
     async_vnet_creation = network_client.virtual_networks.create_or_update(
         GROUP_NAME,
@@ -156,8 +155,9 @@ def create_nic(network_client):
         }
     )
     async_vnet_creation.wait()
+    return
 
-    # Create Subnet
+def create_subnet(network_client):
     print('\nCreate Subnet')
     async_subnet_creation = network_client.subnets.create_or_update(
         GROUP_NAME,
@@ -165,7 +165,16 @@ def create_nic(network_client):
         SUBNET_NAME,
         {'address_prefix': '10.0.0.0/24'}
     )
-    subnet_info = async_subnet_creation.result()
+    return async_subnet_creation.result()
+
+def create_nic(network_client,NIC_NAME):
+    """Create a Network Interface for a VM.
+    """
+    subnet_info = network_client.subnets.get(
+        GROUP_NAME,
+        VNET_NAME,
+        SUBNET_NAME
+    )
 
     # Create NIC
     print('\nCreate NIC')
