@@ -1,0 +1,9 @@
+adal==1.2.2
+attrs==19.3.0
+azure-common==1.1.24
+azure-mgmt-compute==4.6.2
+azure-mgmt-network==2.7.0
+azure-mgmt-resource==2.2.0
+azure-mgmt-storage==7.0.0
+certifi==2019.11.28
+typing==3.7.4.1
