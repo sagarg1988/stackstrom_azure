@@ -9,3 +9,12 @@ certifi==2019.11.28
 haikunator==2.1.0
 typing==3.7.4.1
 easyimap==0.6.3
+flanker==0.9.11
+msrest==0.6.10
+msrestazure==0.6.2
+oauthlib==3.1.0
+ply==3.11
+pycparser==2.19
+PyJWT==1.7.1
+python-dateutil==2.8.1
+regex==2019.12.20
