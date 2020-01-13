@@ -52,7 +52,9 @@ VM_REFERENCE = {
 }
 
 class VmCreate(Action):
-    def run(self,Group_Name='azure-group',Location='Southeast Asia',VM_Name='Linux-VM'):
+    def run(self):
+
+        print(self)
         subscription_id = os.environ.get(
             'AZURE_SUBSCRIPTION_ID',
             'ef80a466-7372-49e9-b247-57b95886881c')
