@@ -9,4 +9,3 @@ certifi==2019.11.28
 haikunator==2.1.0
 typing==3.7.4.1
 easyimap==0.6.3
-flanker==0.9.11
