@@ -6,6 +6,7 @@ keywords:
     - Create VM
 version: 1.1.0
 python_versions:
+  - "2"
   - "3"
 author: Mukesh Kumar.
 email: mukesh.kumar_5375@nihilent.com
