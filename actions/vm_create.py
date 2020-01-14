@@ -101,6 +101,7 @@ class VmCreate(Action):
         async_vm_start = compute_client.virtual_machines.start(GROUP_NAME, VM_NAME)
         async_vm_start.wait()
 
+        # For windows
         # Create a NIC
         nic = create_nic(network_client, W_NIC_NAME)
         print('\nCreating Windows Virtual Machine')
