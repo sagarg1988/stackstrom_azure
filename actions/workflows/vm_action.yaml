@@ -28,5 +28,5 @@ tasks:
       cmd: echo Workflow Successful.
   vm_not_created:
     action: core.local
-      input:
-        cmd: echo Workflow Unsuccessful.
+    input:
+      cmd: echo Workflow Unsuccessful.
