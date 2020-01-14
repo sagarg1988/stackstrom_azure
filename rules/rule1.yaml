@@ -11,7 +11,7 @@ criteria:
     pattern: create vm
     type: contains
 action:
-  ref: stackstrom_azure.vm_action
+  ref: stackstrom_azure.vm_workflow
   parameters:
     Group_Name: '{{trigger.group}}'
     Location: '{{trigger.location}}'
